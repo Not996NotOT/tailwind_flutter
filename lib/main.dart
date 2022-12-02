@@ -39,9 +39,22 @@ class MyApp extends StatelessWidget {
                 Text("⭐️⭐️⭐️⭐️⭐️")
               ]).className("flex flex-col gap-1").build(),
             ]).className("flex flex-row items-center gap-1").build(),
-            Container(child: Div("2022-11-11").className("text-xs text-grayPrimary").build(),color: Colors.yellow,)
-          ]).className("flex flex-row items-center justify-between bg-red-500").build(),
-        ]).className("p-2 bg-blue-500 flex flex-col w-full").build())));
+            Div("2022-11-11").className("text-xs text-grayPrimary").build()
+          ])
+              .className(
+                  "flex flex-row items-center justify-between bg-red-500")
+              .build(),
+          Div("切合实际，蕴含着朴素而深刻的哲理，读来令人精神振奋，情绪激昂。切合实际，蕴含着朴素而深刻的哲理，读来令人精神振奋，情绪激昂。切合实际，蕴含着朴素而深刻的哲理，读来令人精神振奋，情绪激昂。")
+              .className("text-sm text-grayPrimary")
+              .build(),
+          Div([
+            ...List.generate(
+                3,
+                (index) => Flexible(
+                    child: Image.network(
+                        "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202012%2F06%2F20201206161450_88f03.thumb.1000_0.jpg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1672575784&t=1571f8bad7f06206ea84f58b0a02837e")))
+          ]).className("flex flex-row items-center gap-2").build()
+        ]).className("p-2 bg-blue-500 flex flex-col w-full gap-2").build())));
   }
 }
 

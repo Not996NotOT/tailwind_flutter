@@ -16,17 +16,17 @@ class TailWindAnalysis {
   BoxConstraints? size;
   late Alignment alignment;
   late Axis flexDirection;
-  late WrapCrossAlignment flexItems;
-  late WrapAlignment flexJustify;
+  late CrossAxisAlignment flexItems;
+  late MainAxisAlignment flexJustify;
   double gap = 0;
   TailWindAnalysis() {
     fontSize = 16;
     color = Colors.black;
     fontWeight = FontWeight.normal;
     flexDirection = Axis.horizontal;
-    flexItems = WrapCrossAlignment.start;
-    flexJustify = WrapAlignment.start;
-    alignment = Alignment.topLeft;
+    flexItems = CrossAxisAlignment.start;
+    flexJustify = MainAxisAlignment.start;
+    alignment = Alignment.center;
   }
 
   _analysisConfigColr(Color color, String colorStr) {
@@ -262,7 +262,16 @@ class TailWindAnalysis {
     if (textStr.startsWith("text-")) {
       var textSplite = textStr.split("-");
       if (textSplite.length > 0) {
-        if (["xs"].contains(textSplite[1])) {
+        if (["xs,sm"].contains(textSplite[1])) {
+          switch (textSplite[1]) {
+            case "xs":
+              fontSize = 12;
+              break;
+            case "sm":
+              fontSize = 14;
+              break;
+            default:
+          }
         } else {
           color = _strForColor(textSplite[1]);
         }
@@ -293,7 +302,7 @@ class TailWindAnalysis {
       if (itemsStrSpli.length > 0) {
         switch (itemsStrSpli[1]) {
           case "center":
-            flexItems = WrapCrossAlignment.center;
+            flexItems = CrossAxisAlignment.center;
             _analysisAlignment();
             break;
 
@@ -309,11 +318,11 @@ class TailWindAnalysis {
       if (justifyStrSpli.length > 0) {
         switch (justifyStrSpli[1]) {
           case "center":
-            flexJustify = WrapAlignment.center;
+            flexJustify = MainAxisAlignment.center;
             _analysisAlignment();
             break;
           case "between":
-            flexJustify = WrapAlignment.spaceBetween;
+            flexJustify = MainAxisAlignment.spaceBetween;
             break;
           default:
         }
@@ -399,7 +408,7 @@ class Div {
   }
 
   Widget build() {
-    print(_tailWindAnalysis.size);
+    print(_tailWindAnalysis.alignment);
     List<Widget> newList = [];
     if (_child.runtimeType == String) {
       _child = Text(_child,
@@ -411,15 +420,20 @@ class Div {
       var list = (_child as List);
       list.forEach((item) {
         newList.add(item);
+        newList.add(SizedBox(
+          height: _tailWindAnalysis.flexDirection == Axis.vertical
+              ? _tailWindAnalysis.gap
+              : 0,
+          width: _tailWindAnalysis.flexDirection == Axis.horizontal
+              ? _tailWindAnalysis.gap
+              : 0,
+        ));
       });
-      _child = Wrap(
-          alignment: _tailWindAnalysis.flexJustify,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          runSpacing: _tailWindAnalysis.gap,
-          spacing: _tailWindAnalysis.gap,
-          direction: _tailWindAnalysis.flexDirection,
-          runAlignment: _tailWindAnalysis.flexJustify,
+      newList.removeLast();
+      _child = Flex(
+          mainAxisAlignment: _tailWindAnalysis.flexJustify,
           crossAxisAlignment: _tailWindAnalysis.flexItems,
+          direction: _tailWindAnalysis.flexDirection,
           children: newList);
     }
 
