@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+var config = {
+  "colors": {"grayPrimary": 0xFF64696E}
+};
 
 class TailWindAnalysis {
   late double fontSize;
@@ -24,6 +29,16 @@ class TailWindAnalysis {
     alignment = Alignment.topLeft;
   }
 
+  _analysisConfigColr(Color color, String colorStr) {
+    if (config["colors"]!.isNotEmpty) {
+      var color0x = config["colors"]![colorStr];
+      if (color0x != null) {
+        color = Color(color0x);
+      }
+    }
+    return color;
+  }
+
   Color _strForColor(String colorStr) {
     Color color = Colors.transparent;
     switch (colorStr) {
@@ -39,12 +54,16 @@ class TailWindAnalysis {
       case "red":
         color = Colors.red;
         break;
-      case "Yellow":
-        color = Colors.red;
+      case "yellow":
+        color = Colors.yellow;
+        break;
+      case "blue":
+        color = Colors.blue;
         break;
       default:
+        color = _analysisConfigColr(color, colorStr);
+        break;
     }
-
     return color;
   }
 
@@ -59,6 +78,9 @@ class TailWindAnalysis {
         switch (fontSplite[1]) {
           case "bold":
             fontWeight = FontWeight.bold;
+            break;
+          case "medium":
+            fontWeight = FontWeight.w500;
             break;
           case "base":
             fontSize = 16;
@@ -93,17 +115,29 @@ class TailWindAnalysis {
     if (widthStr.startsWith("w-")) {
       var widthStrSpli = widthStr.split("-");
       if (widthStrSpli.length > 0) {
-        var number = double.tryParse(widthStrSpli[1]);
-        if (number != null) {
-          var value = number * 4;
+        if (widthStrSpli[1].contains("full")) {
           if (size != null) {
             size = BoxConstraints(
                 minHeight: size!.minHeight,
                 maxHeight: size!.maxHeight,
-                minWidth: value,
-                maxWidth: value);
+                minWidth: Get.width,
+                maxWidth: Get.width);
           } else {
-            size = BoxConstraints(minWidth: value, maxWidth: value);
+            size = BoxConstraints(minWidth: Get.width, maxWidth: Get.width);
+          }
+        } else {
+          var number = double.tryParse(widthStrSpli[1]);
+          if (number != null) {
+            var value = number * 4;
+            if (size != null) {
+              size = BoxConstraints(
+                  minHeight: size!.minHeight,
+                  maxHeight: size!.maxHeight,
+                  minWidth: value,
+                  maxWidth: value);
+            } else {
+              size = BoxConstraints(minWidth: value, maxWidth: value);
+            }
           }
         }
       }
@@ -112,6 +146,10 @@ class TailWindAnalysis {
 
   analysisRadius(String radiusStr) {
     if (radiusStr.startsWith("rounded-")) {
+      var radiusStrSpli = radiusStr.split("-");
+      if (radiusStrSpli.length > 0) {
+        borderRadius = BorderRadius.all(Radius.circular(9999));
+      }
     } else if (radiusStr.startsWith("rounded")) {
       borderRadius = BorderRadius.all(Radius.circular(4));
     }
@@ -125,7 +163,7 @@ class TailWindAnalysis {
         if (backgroundStrSplit.length >= 2) {
           color = _strForColor(backgroundStrSplit[1]);
         }
-        if (backgroundStr.length >= 3) {
+        if (backgroundStrSplit.length >= 3) {
           var number = double.tryParse(backgroundStrSplit[2]);
           if (number != null) {
             color = _colorWithOpacity(color, number);
@@ -162,13 +200,12 @@ class TailWindAnalysis {
       if (number != null) {
         if (padding != null) {
           padding = EdgeInsets.only(
-            left: padding!.left,
-            top: number * 4,
-            right: padding!.right,
-            bottom: number * 4,
-          );
+              top: number * 4,
+              bottom: number * 4,
+              left: padding!.left,
+              right: padding!.right);
         } else {
-          padding = EdgeInsets.only(left: number * 4, right: number * 4);
+          padding = EdgeInsets.only(top: number * 4, bottom: number * 4);
         }
       }
     }
@@ -209,11 +246,26 @@ class TailWindAnalysis {
     }
   }
 
+  _analsysTextFont(String textStr) {
+    switch (textStr) {
+      case "xs":
+        fontSize = 12;
+        break;
+      case "base":
+        fontSize = 16;
+        break;
+      default:
+    }
+  }
+
   analysisText(String textStr) {
     if (textStr.startsWith("text-")) {
       var textSplite = textStr.split("-");
       if (textSplite.length > 0) {
-        color = _strForColor(textSplite[1]);
+        if (["xs"].contains(textSplite[1])) {
+        } else {
+          color = _strForColor(textSplite[1]);
+        }
       }
     }
   }
@@ -260,6 +312,9 @@ class TailWindAnalysis {
             flexJustify = WrapAlignment.center;
             _analysisAlignment();
             break;
+          case "between":
+            flexJustify = WrapAlignment.spaceBetween;
+            break;
           default:
         }
       }
@@ -267,7 +322,6 @@ class TailWindAnalysis {
   }
 
   _analysisAlignment() {
-    print(flexItems);
     if (flexItems == WrapCrossAlignment.center) {
       if (flexDirection == Axis.horizontal) {
         alignment = Alignment.centerLeft;
@@ -345,6 +399,7 @@ class Div {
   }
 
   Widget build() {
+    print(_tailWindAnalysis.size);
     List<Widget> newList = [];
     if (_child.runtimeType == String) {
       _child = Text(_child,
@@ -358,6 +413,7 @@ class Div {
         newList.add(item);
       });
       _child = Wrap(
+          alignment: _tailWindAnalysis.flexJustify,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           runSpacing: _tailWindAnalysis.gap,
           spacing: _tailWindAnalysis.gap,
@@ -376,7 +432,11 @@ class Div {
               borderRadius: _tailWindAnalysis.borderRadius,
               color: _tailWindAnalysis.backgroundColor),
           padding: _tailWindAnalysis.padding,
-          alignment: _tailWindAnalysis.alignment,
+          alignment: _tailWindAnalysis.size != null &&
+                  _tailWindAnalysis.size!.minHeight > 0 &&
+                  _tailWindAnalysis.size!.minWidth > 0
+              ? _tailWindAnalysis.alignment
+              : null,
           child: _child,
         ));
   }

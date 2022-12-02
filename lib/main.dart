@@ -26,19 +26,22 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: Scaffold(
-          body: SafeArea(
-              child: Div([
-            ...List.generate(
-                10,
-                (index) => Div("123")
-                    .className(
-                        "h-10 w-10 flex flex-row justify-center items-center bg-blue-100")
-                    .build()),
-          ])
+            body: SafeArea(
+                child: Div([
+          Div([
+            Div([
+              Div("头像")
                   .className(
-                      "flex flex-row justify-center items-center text-bold text-white border border-white p-2 rounded bg-yellow-400 gap-4")
-                  .build()),
-        ));
+                      "h-16 w-16 flex flex-row items-center justify-center bg-blue-500 rounded-full")
+                  .build(),
+              Div([
+                Div("南瓜茶").className("font-medium text-sm text-black").build(),
+                Text("⭐️⭐️⭐️⭐️⭐️")
+              ]).className("flex flex-col gap-1").build(),
+            ]).className("flex flex-row items-center gap-1").build(),
+            Container(child: Div("2022-11-11").className("text-xs text-grayPrimary").build(),color: Colors.yellow,)
+          ]).className("flex flex-row items-center justify-between bg-red-500").build(),
+        ]).className("p-2 bg-blue-500 flex flex-col w-full").build())));
   }
 }
 
